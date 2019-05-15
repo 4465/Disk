@@ -80,7 +80,6 @@ class Algorithm:
         track_request_copy.sort()
         i = 0
         is_find = False
-
         if self.SCAN_DIRECTION == 1:
             while i < track_request_copy.__len__():
                 if (self.TRACK_START <= track_request_copy[i]) & (is_find == False):
@@ -104,9 +103,7 @@ class Algorithm:
                     index += 1
                     current = track_request_copy[index % self.TRACK_REQUEST_COUNT]
                 i += 1
-
         return queue_CSCAN
-
 
     # ****************** NStepSCAN算法 ************************
     def NStepSCAN(self):
@@ -140,14 +137,18 @@ class Algorithm:
             Count += 1
         return queue_NStepSCAN
 
+    def caculate(self,operation):
+        if operation == 'FCFS':
+            return self.FCFS()
+        elif operation == 'SSTF':
+            return self.SSTF()
+        elif operation == 'SCAN':
+            return self.SCAN()
+        elif operation == 'CSCAN':
+            return self.CSCAN()
+        elif operation == 'NstepSCAN':
+            return self.NStepSCAN()
 
-    # def caculate(self,queue):
-    #     print('访问的磁道序列为: ', end='')
-    #     print(queue)
-    #     sum_gap = sum([(abs(queue[i] - queue[i - 1])) for i in range(1, len(queue))])
-    #     print('移动的磁道数为：%d' % sum_gap)
-    #     print('平均移动的磁道数为：%.2f' % (sum_gap / TRACK_REQUEST_COUNT))
-    #     print("")
 
 
 
