@@ -5,6 +5,10 @@ import time
 class Disk:
     def __init__(self):
         self.Al = Algorithm()
+        self.track_request = [None] * self.Al.TRACK_REQUEST_COUNT
+        for i in range(self.Al.TRACK_REQUEST_COUNT):
+            self.track_request[i] = random.randint(0, self.Al.TRACK_MAX_COUNT)
+
         point =[]
         Window = Tk()
         Window.geometry('5000x5000')
@@ -27,17 +31,10 @@ class Disk:
         self.oval_x1 = 90
         self.oval_y1 = 90
 
-        # btnOval = Button(frame3,text="Oval",command=self.displayOval)
-        # btnLine = Button(frame3,text="Line",command=self.displayStartLine)
-        # btnText = Button(frame3,text="Text",command=self.displayDiskNum)
-        # btnOval.grid(row=1, column=1)
-        # btnLine.grid(row=1, column=2)
-        # btnText.grid(row=1, column=3)
-
         self.textLog = Text(frame3,height=17)
         self.textLog.grid(row=1,column=1)
         self.textLog.insert(END,'#每次生成的磁道序列是随机的，对于不同的序列算法的算法的性能是不一样的\n#通过多次比较观察结果，SSTF是算法中移动的磁道数最少的')
-        self.textLog.insert(END,'\n#TRACK SEQUECE:\n'+str(self.Al.track_request))
+        self.textLog.insert(END,'\n#TRACK SEQUECE:\n'+str(self.track_request))
 
         self.var = StringVar()
         self.var.set('FCFS')
@@ -51,18 +48,12 @@ class Disk:
         r4.grid(row=1, column=4)
         r5 = Radiobutton(frame4, text='NstepSCAN', variable=self.var, value='NstepSCAN')
         r5.grid(row=1, column=5)
+        r6 = Radiobutton(frame4, text='FSCAN', variable=self.var, value='FSCAN')
+        r6.grid(row=1, column=6)
 
 
-        self.btnAl_1 = Button(frame4, text="运行",command =lambda :self.displayStartLine(self.Al.caculate(self.var.get())))
+        self.btnAl_1 = Button(frame4, text="运行",command =lambda :self.displayStartLine(self.Al.caculate(self.track_request,self.var.get())))
         self.btnAl_1.grid(row=2,column=1)
-        # self.btnAl_2 = Button(frame4, text="SSTF", command=lambda :self.displayStartLine(self.Al.SSTF()))
-        # self.btnAl_2.grid(row=2,column=2)
-        # self.btnAl_3 = Button(frame4, text="SCAN", command=lambda :self.displayStartLine(self.Al.SCAN()))
-        # self.btnAl_3 .grid(row=2,column=3)
-        # self.btnAl_4 = Button(frame4, text="CSCAN", command=lambda :self.displayStartLine(self.Al.CSCAN()))
-        # self.btnAl_4.grid(row=2,column=4)
-        # self.btnAl_5 = Button(frame4, text="NstepSCAN", command=lambda :self.displayStartLine(self.Al.NStepSCAN()))
-        # self.btnAl_5.grid(row=2,column=5)
 
         Window.mainloop()
 
