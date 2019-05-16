@@ -2,22 +2,25 @@ from tkinter import *
 import turtle as t
 from Algorithm import *
 import time
+import threading
 class Disk:
     def __init__(self):
         self.Al = Algorithm()
         self.track_request = [None] * self.Al.TRACK_REQUEST_COUNT
         for i in range(self.Al.TRACK_REQUEST_COUNT):
             self.track_request[i] = random.randint(0, self.Al.TRACK_MAX_COUNT)
-
-        point =[]
+        self.rectangle = []
+        # 声明一个是否按下开始的变量
+        self.isloop = False
+        self.newloop = False
         Window = Tk()
         Window.geometry('5000x5000')
         Window.title("python模拟磁盘调度算法")
-        frame1 = Frame(Window,border=1,relief=SUNKEN)
-        frame2 = Frame(Window,border=1,relief=SUNKEN)
-        frame3 = Frame(Window,border=1,relief=SUNKEN)
-        frame4 = Frame(Window,border=1,relief=SUNKEN)
-        frame1.grid(row=1,column=1,)
+        frame1 = Frame(Window,relief=SUNKEN)
+        frame2 = Frame(Window,relief=SUNKEN)
+        frame3 = Frame(Window,relief=SUNKEN)
+        frame4 = Frame(Window   ,relief=SUNKEN)
+        frame1.grid(row=1, column=1,)
         frame2.grid(row=1, column=2)
         frame3.grid(row=2, column=1)
         frame4.grid(row=2, column=2)
@@ -25,11 +28,6 @@ class Disk:
         self.canvas2 = Canvas(frame2, width=500,height=500,bg="yellow")
         self.canvas1.grid(row=1,column=1)
         self.canvas2.grid(row=1, column=1)
-        self.oval_count = 0
-        self.oval_x0 = 10
-        self.oval_y0 = 10
-        self.oval_x1 = 90
-        self.oval_y1 = 90
 
         self.textLog = Text(frame3,height=17)
         self.textLog.grid(row=1,column=1)
@@ -50,11 +48,12 @@ class Disk:
         r5.grid(row=1, column=5)
         r6 = Radiobutton(frame4, text='FSCAN', variable=self.var, value='FSCAN')
         r6.grid(row=1, column=6)
-
-
         self.btnAl_1 = Button(frame4, text="运行",command =lambda :self.displayStartLine(self.Al.caculate(self.track_request,self.var.get())))
         self.btnAl_1.grid(row=2,column=1)
-
+        self.btnAl_2 = Button(frame4,text="运行",command=lambda :self.RectangleShow(self.Al.caculate(self.track_request,self.var.get())))
+        self.btnAl_2.grid(row=2,column=2)
+        self.displayRectangle()
+        #self.DrawTurrle()
         Window.mainloop()
 
     def displayOval(self):
@@ -63,12 +62,11 @@ class Disk:
         self.oval_y0 += self.oval_count * 10
         self.oval_x1 -= self.oval_count * 10
         self.oval_y1 -= self.oval_count * 10
-        #self.canvas.create_rectangle(self.oval_x0,self.oval_y0,self.oval_x1,self.oval_y1)
         self.canvas.create_oval(self.oval_x0,self.oval_y0,self.oval_x1,self.oval_y1,fill=color[self.oval_count])
         self.oval_count += 1
 
+
     def displayStartLine(self,point):
-        #point = [20,45, 51, 66, 73, 84, 93, 26, 20, 3]
         point = list(point)
         theScreen = t.TurtleScreen(self.canvas2)
         path = t.RawTurtle(theScreen)
@@ -91,17 +89,91 @@ class Disk:
             path.penup()
             path.write(point[i],font=("Arial",8))
             path.pendown()
-            # path.penup()
-            # path.goto(point[i] * 5 - 250, 230 - 20 * i)
-            # path.pendown()
         self.textLog.insert(END,'\n********'+str(self.var.get())+'************')
         self.textLog.insert(END,'\n访问的磁道序列为:\n'+str(point))
         sum_gap = sum([(abs(point[i] - point[i - 1])) for i in range(1, len(point))])
         self.textLog.insert(END,'\n移动的磁道数为：'+str(sum_gap))
         self.textLog.insert(END,'\n平均移动的磁道数为：'+str(sum_gap / self.Al.TRACK_REQUEST_COUNT))
+        #self.newtask(point)
+        self.RectangleShow(point)
+
+    def displayRectangle(self):
+        x0 = 0
+        y0 = 0
+        x1 = 50
+        y1 = 50
+        count = 1
+        for i in range(10):
+            y0 = i * 50
+            y1 = i * 50 + 50
+            for j in range(10):
+                x0 = j * 50
+                x1 = j * 50 +50
+                if count in self.track_request:
+                    self.rectangle.append(self.canvas1.create_rectangle(x0,y0,x1,y1,fill="red"))
+                elif count == 11:
+                    print(x0,y0,x1,y1)
+                    self.rectangle.append(self.canvas1.create_rectangle(x0,y0,x1,y1,fill="pink"))
+                else:
+                    self.rectangle.append(self.canvas1.create_rectangle(x0, y0, x1, y1))
+                self.canvas1.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=str(count))
+                count += 1
+
+    def RectangleShow(self,point):
+        self.displayRectangle()
+        count = point[0]                #11
+        print("count:",count)
+        cnt = 1
+        x0 = (count % 10 - 1) * 50
+        x1 = count % 10 * 50
+        y0 = (count // 10) * 50
+        y1 = count // 10 * 50 + 50
+        # print(x0,y0,x1,y1)
+        cv = self.canvas1.create_rectangle(x0, y0, x1, y1, fill="green")
+        while True:
+            if self.newloop == True:
+                self.newloop = False
+                return
+                # 延时操作
+            time.sleep(0.1)
+            if count % 10 != 0:
+                x0 = x0 + 50
+                x1 = x1 + 50
+                self.canvas1.coords(cv,x0,y0,x1,y1)   #右移
+                print("右移一个",count)
+                self.canvas1.update_idletasks()
+                self.canvas1.update()
+            else:
+                if count == 100:
+                    count = 0
+                    x0 = 0
+                    x1 = 50
+                    y0 = 0
+                    y1 = 50
+                    self.canvas1.coords(cv,0,0,50,50)      #移动到0位置
+                    print("移动到0位置")
+                    self.canvas1.update_idletasks()
+                    self.canvas1.update()
+                else:                                      #移动到下一行行首
+                    x0 = 0
+                    y0 = y0 + 50
+                    x1 = 50
+                    y1 = y1+ 50
+                    self.canvas1.coords(cv,x0,y0,x1,y1)
+                    print("移动到下一行行首")
+                    self.canvas1.update_idletasks()
+                    self.canvas1.update()
+            count += 1
+            if count == point[cnt]:
+                cv = self.canvas1.create_rectangle(x0, y0, x1, y1,fill="green")
+                cnt += 1
+                print("抓取",cnt)
+                self.canvas1.update_idletasks()
+                self.canvas1.update()
+            if cnt == 11:
+                print(count)
+                return
 
 
-    def displayDiskNum(self):
-        self.canvas.create_text(10,15,text='20')
 
 Disk()
