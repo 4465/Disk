@@ -2,7 +2,8 @@ from tkinter import *
 import turtle as t
 from Algorithm import *
 import time
-import threading
+
+
 class Disk:
     def __init__(self):
         self.Al = Algorithm()
@@ -14,23 +15,25 @@ class Disk:
         self.isloop = False
         self.newloop = False
         Window = Tk()
-        Window.geometry('5000x5000')
+        Window.geometry('1100x1100')
         Window.title("python模拟磁盘调度算法")
-        frame1 = Frame(Window,relief=SUNKEN)
-        frame2 = Frame(Window,relief=SUNKEN)
-        frame3 = Frame(Window,relief=SUNKEN)
-        frame4 = Frame(Window   ,relief=SUNKEN)
-        frame1.grid(row=1, column=1,)
+        frame = Frame(Window)
+        frame.grid(row=0,column=0)
+        frame1 = Frame(frame,bg="white",bd=2,relief=GROOVE,width=500)
+        frame2 = Frame(frame)
+        frame3 = Frame(frame)
+        frame4 = Frame(frame)
+        frame1.grid(row=1, column=1,padx=10)
         frame2.grid(row=1, column=2)
         frame3.grid(row=2, column=1)
         frame4.grid(row=2, column=2)
-        self.canvas1 = Canvas(frame1, width=500,height=500,bg="yellow")
-        self.canvas2 = Canvas(frame2, width=500,height=500,bg="yellow")
+        self.canvas1 = Canvas(frame1, width=510,height=510)
+        self.canvas2 = Canvas(frame2, width=500,height=500,bg="white")
         self.canvas1.grid(row=1,column=1)
         self.canvas2.grid(row=1, column=1)
 
         self.textLog = Text(frame3,height=17)
-        self.textLog.grid(row=1,column=1)
+        self.textLog.grid(row=0,column=1,padx=5)
         self.textLog.insert(END,'#每次生成的磁道序列是随机的，对于不同的序列算法的算法的性能是不一样的\n#通过多次比较观察结果，SSTF是算法中移动的磁道数最少的')
         self.textLog.insert(END,'\n#TRACK SEQUECE:\n'+str(self.track_request))
 
@@ -53,18 +56,7 @@ class Disk:
         self.btnAl_2 = Button(frame4,text="运行",command=lambda :self.RectangleShow(self.Al.caculate(self.track_request,self.var.get())))
         self.btnAl_2.grid(row=2,column=2)
         self.displayRectangle()
-        #self.DrawTurrle()
         Window.mainloop()
-
-    def displayOval(self):
-        color = ['white','blue','red','green']
-        self.oval_x0 += self.oval_count * 10
-        self.oval_y0 += self.oval_count * 10
-        self.oval_x1 -= self.oval_count * 10
-        self.oval_y1 -= self.oval_count * 10
-        self.canvas.create_oval(self.oval_x0,self.oval_y0,self.oval_x1,self.oval_y1,fill=color[self.oval_count])
-        self.oval_count += 1
-
 
     def displayStartLine(self,point):
         point = list(point)
@@ -94,7 +86,6 @@ class Disk:
         sum_gap = sum([(abs(point[i] - point[i - 1])) for i in range(1, len(point))])
         self.textLog.insert(END,'\n移动的磁道数为：'+str(sum_gap))
         self.textLog.insert(END,'\n平均移动的磁道数为：'+str(sum_gap / self.Al.TRACK_REQUEST_COUNT))
-        #self.newtask(point)
         self.RectangleShow(point)
 
     def displayRectangle(self):
@@ -173,7 +164,6 @@ class Disk:
             if cnt == 11:
                 print(count)
                 return
-
 
 
 Disk()
